@@ -1,5 +1,6 @@
 :host {
-  display: block;
+  display: grid;
+  place-items: center;
   height: 100%;
   padding: 16px;
 }

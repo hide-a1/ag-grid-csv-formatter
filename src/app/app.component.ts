@@ -13,17 +13,37 @@ import { ColDef } from 'ag-grid-community';
 export class AppComponent {
   themeClass = 'ag-theme-quartz';
   // Row Data: The data to be displayed.
-  rowData = [
-    { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-    { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
-    { make: 'Toyota', model: 'Corolla', price: 29600, electric: false },
-  ];
+  rowData: any[] = [];
 
   // Column Definitions: Defines the columns to be displayed.
-  colDefs: ColDef[] = [
-    { field: 'make' },
-    { field: 'model' },
-    { field: 'price' },
-    { field: 'electric' },
-  ];
+  colDefs: ColDef[] = [];
+
+  // Import CSV file
+  onFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.handleFile(input.files[0]);
+    }
+  }
+
+  handleFile(file: File) {
+    // eslint-disable-next-line no-console
+    console.log('Selected file:', file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const csvData = reader.result as string;
+      const lines = csvData.split('\n');
+      const headers = lines[0].split(',');
+      const rows = lines.slice(1).map((line) => line.split(','));
+
+      this.colDefs = headers.map((header) => ({ field: header }));
+      this.rowData = rows.map((row) =>
+        headers.reduce((acc: any, header, i) => {
+          acc[header] = row[i];
+          return acc;
+        }, {})
+      );
+    };
+    reader.readAsText(file);
+  }
 }
