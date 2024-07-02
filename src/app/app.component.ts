@@ -5,9 +5,7 @@ import {
   ColDef,
   GridApi,
   GridReadyEvent,
-  IRowNode,
   RowSelectedEvent,
-  SelectionChangedEvent,
 } from 'ag-grid-community';
 
 @Component({
@@ -30,7 +28,6 @@ export class AppComponent {
   };
   rowSelection: 'single' | 'multiple' = 'multiple';
   rowSelected = false;
-  selectedRows: IRowNode<any>[] = [];
 
   // Import CSV file
   onFileChange(event: Event) {
@@ -41,8 +38,6 @@ export class AppComponent {
   }
 
   handleFile(file: File) {
-    // eslint-disable-next-line no-console
-    console.log('Selected file:', file);
     const reader = new FileReader();
     reader.onload = () => {
       const csvData = reader.result as string;
@@ -66,7 +61,6 @@ export class AppComponent {
     reader.readAsText(file);
   }
 
-  // Export CSV file
   exportCsv() {
     this.gridApi.exportDataAsCsv();
   }
@@ -77,10 +71,6 @@ export class AppComponent {
 
   onRowSelected(event: RowSelectedEvent) {
     this.rowSelected = event.node.isSelected() ?? false;
-  }
-
-  onSelectionChanged(event: SelectionChangedEvent) {
-    this.selectedRows = event.api.getSelectedNodes();
   }
 
   deleteSelectedRows() {
