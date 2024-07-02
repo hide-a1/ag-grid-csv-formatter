@@ -25,6 +25,9 @@ export class AppComponent {
   colDefs: ColDef[] = [];
   defaultColDef: ColDef = {
     editable: true,
+    filter: 'agTextColumnFilter',
+    suppressHeaderMenuButton: true,
+    suppressHeaderContextMenu: true,
   };
   rowSelection: 'single' | 'multiple' = 'multiple';
   rowSelected = false;
