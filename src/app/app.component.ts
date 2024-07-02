@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +11,8 @@ import { ColDef } from 'ag-grid-community';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
+  private gridApi!: GridApi;
+
   themeClass = 'ag-theme-quartz';
   // Row Data: The data to be displayed.
   rowData: any[] = [];
@@ -45,5 +47,14 @@ export class AppComponent {
       );
     };
     reader.readAsText(file);
+  }
+
+  // Export CSV file
+  exportCsv() {
+    this.gridApi.exportDataAsCsv();
+  }
+
+  onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
   }
 }
