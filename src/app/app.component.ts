@@ -16,9 +16,11 @@ export class AppComponent {
   themeClass = 'ag-theme-quartz';
   // Row Data: The data to be displayed.
   rowData: any[] = [];
-
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [];
+  defaultColDef: ColDef = {
+    editable: true,
+  };
 
   // Import CSV file
   onFileChange(event: Event) {
@@ -38,7 +40,10 @@ export class AppComponent {
       const headers = lines[0].split(',');
       const rows = lines.slice(1).map((line) => line.split(','));
 
-      this.colDefs = headers.map((header) => ({ field: header }));
+      this.colDefs = headers.map((header) => ({
+        field: header,
+        cellEditor: 'agTextCellEditor',
+      }));
       this.rowData = rows.map((row) =>
         headers.reduce((acc: any, header, i) => {
           acc[header] = row[i];
