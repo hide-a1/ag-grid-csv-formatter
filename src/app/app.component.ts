@@ -80,4 +80,10 @@ export class AppComponent {
     const selectedData = this.gridApi.getSelectedRows();
     this.gridApi.applyTransaction({ remove: selectedData })!;
   }
+
+  addRow() {
+    this.gridApi.applyTransaction({
+      add: [{}],
+    });
+  }
 }

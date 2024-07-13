@@ -5,6 +5,9 @@
       <button [disabled]="!rowSelected" (click)="deleteSelectedRows()">
         選択行を削除
       </button>
+      <button (click)="addRow()" [disabled]="rowData.length === 0">
+        行追加
+      </button>
       <button (click)="exportCsv()" [disabled]="rowData.length === 0">
         CSVエクスポート
       </button>
