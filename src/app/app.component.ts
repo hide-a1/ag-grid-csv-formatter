@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -11,7 +12,7 @@ import {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AgGridAngular],
+  imports: [RouterOutlet, AgGridAngular, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
@@ -31,6 +32,7 @@ export class AppComponent {
   };
   rowSelection: 'single' | 'multiple' = 'multiple';
   rowSelected = false;
+  newColumnName = signal('');
 
   // Import CSV file
   onFileChange(event: Event) {
@@ -85,5 +87,16 @@ export class AppComponent {
     this.gridApi.applyTransaction({
       add: [{}],
     });
+  }
+
+  addColumn(columnName: string) {
+    const newCol = {
+      field: columnName,
+      headerName: columnName,
+      cellEditor: 'agTextCellEditor',
+    };
+    this.colDefs.push(newCol);
+    this.gridApi.updateGridOptions({ columnDefs: this.colDefs });
+    this.newColumnName.set('');
   }
 }

@@ -1,13 +1,31 @@
 <div class="container">
   <div class="actions">
     <input type="file" accept=".csv" (change)="onFileChange($event)" />
-    <div style="display: flex; gap: 4px">
+    <div style="display: flex; gap: 4px; align-items: flex-end">
       <button [disabled]="!rowSelected" (click)="deleteSelectedRows()">
         選択行を削除
       </button>
       <button (click)="addRow()" [disabled]="rowData.length === 0">
         行追加
       </button>
+      <span style="display: flex; gap: 4px; align-items: flex-end">
+        <label style="display: flex; flex-direction: column"
+          >列名
+          <input
+            type="text"
+            [(ngModel)]="newColumnName"
+            [disabled]="rowData.length === 0"
+          />
+        </label>
+
+        <button
+          (click)="addColumn(newColumnName())"
+          [disabled]="!newColumnName()"
+        >
+          列追加
+        </button>
+      </span>
+
       <button (click)="exportCsv()" [disabled]="rowData.length === 0">
         CSVエクスポート
       </button>
