@@ -20,6 +20,10 @@ import {
   SizeColumnsToFitProvidedWidthStrategy,
 } from 'ag-grid-community';
 import { AddColumnDialogComponent } from './components/dialogs/add-column-dialog/add-column-dialog.component';
+import {
+  ReplaceColumnValue,
+  ReplaceColumnValueDialogComponent,
+} from './components/dialogs/replace-column-value-dialog/replace-column-value-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -210,5 +214,66 @@ export class AppComponent {
     };
     this.colDefs.push(newCol);
     this.gridApi.updateGridOptions({ columnDefs: this.colDefs });
+  }
+
+  openReplaceColumnValueDialog(): void {
+    const headerKeys = this.gridApi.getColumnState().map((col) => col.colId);
+    this.dialog
+      .open(ReplaceColumnValueDialogComponent, {
+        data: {
+          headerKeys,
+          rowData: this.rowData,
+        },
+      })
+      .afterClosed()
+      .subscribe((replaceColumnValue: ReplaceColumnValue | undefined) => {
+        if (replaceColumnValue !== undefined) {
+          const { columnKey, target, replace, replaceType, newColumnName } =
+            replaceColumnValue;
+          switch (replaceType) {
+            case 'replace':
+              this.replaceColumnValue(columnKey, target, replace);
+              break;
+            case 'add':
+              this.replaceColumnValueAndAddColumn(
+                columnKey,
+                target,
+                replace,
+                newColumnName!
+              );
+              break;
+          }
+        }
+      });
+  }
+
+  replaceColumnValue(
+    targetColumnKey: string,
+    targetValue: string,
+    replaceValue: string
+  ): void {
+    this.rowData.forEach((row) => {
+      if (row[targetColumnKey] === targetValue) {
+        row[targetColumnKey] = replaceValue;
+      }
+    });
+    this.gridApi.updateGridOptions({ rowData: this.rowData });
+  }
+
+  replaceColumnValueAndAddColumn(
+    columnKey: string,
+    target: string,
+    replace: string,
+    newColumnName: string
+  ): void {
+    this.rowData.forEach((row) => {
+      if (row[columnKey] === target) {
+        row[newColumnName] = replace;
+      } else {
+        row[newColumnName] = row[columnKey];
+      }
+    });
+    this.addColumn(newColumnName);
+    this.gridApi.updateGridOptions({ rowData: this.rowData });
   }
 }
