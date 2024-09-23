@@ -72,7 +72,7 @@ export class AppComponent {
   duplicateValueMap = new Map<string, string[]>();
 
   rowSelected = signal<boolean>(false);
-  count = signal<number | null>(null);
+  count = signal<number>(0);
 
   // Import CSV file
   onFileChange(event: Event) {
