@@ -1,4 +1,5 @@
 import { AG_GRID_LOCALE_JP } from '@ag-grid-community/locale';
+import { DecimalPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,6 +34,7 @@ import { AddColumnDialogComponent } from './components/dialogs/add-column-dialog
     MatMenuModule,
     MatDialogModule,
     MatTooltipModule,
+    DecimalPipe,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -63,12 +65,14 @@ export class AppComponent {
     defaultMinWidth: 100,
   };
   rowSelection: 'single' | 'multiple' = 'multiple';
-  rowSelected = signal<boolean>(false);
   localText = {
     ...AG_GRID_LOCALE_JP,
     noRowsToShow: 'データがありません、CSVファイルをインポートしてください。',
   };
   duplicateValueMap = new Map<string, string[]>();
+
+  rowSelected = signal<boolean>(false);
+  count = signal<number | null>(null);
 
   // Import CSV file
   onFileChange(event: Event) {
@@ -148,6 +152,7 @@ export class AppComponent {
         this.duplicateValueMap.set(headerKey, Array.from(duplicatedValues));
       });
 
+      this.count.set(this.rowData.length);
       this.gridApi.updateGridOptions({
         columnDefs: this.colDefs,
         rowData: this.rowData,
