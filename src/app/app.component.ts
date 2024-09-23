@@ -30,6 +30,9 @@ export class AppComponent {
     filter: 'agTextColumnFilter',
     suppressHeaderMenuButton: true,
     suppressHeaderContextMenu: true,
+    filterParams: {
+      buttons: ['reset'],
+    },
   };
   rowSelection: 'single' | 'multiple' = 'multiple';
   rowSelected = false;
