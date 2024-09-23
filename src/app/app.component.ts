@@ -130,7 +130,7 @@ export class AppComponent {
         },
       }));
       const indexColDef: ColDef = {
-        field: 'index',
+        field: 'index-column',
         headerName: '',
         valueGetter: 'node.rowIndex + 1',
         headerCheckboxSelection: true,
@@ -177,7 +177,7 @@ export class AppComponent {
     const columnIds =
       this.gridApi
         .getColumns()
-        ?.filter((col) => col.getColDef().field !== 'index')
+        ?.filter((col) => col.getColDef().field !== 'index-column')
         .map((col) => col.getColId()) ?? [];
     this.gridApi.exportDataAsCsv({ columnKeys: columnIds });
   }

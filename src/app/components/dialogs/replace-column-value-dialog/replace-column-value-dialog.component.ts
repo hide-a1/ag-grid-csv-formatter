@@ -49,7 +49,7 @@ export class ReplaceColumnValueDialogComponent {
   readonly data = inject<ReplaceTargetColumn>(MAT_DIALOG_DATA);
   readonly dialogRef = inject(MatDialogRef<ReplaceColumnValueDialogComponent>);
 
-  headerKeys = this.data.headerKeys;
+  headerKeys = this.data.headerKeys.filter((key) => key !== 'index-column');
 
   selectedColumn = signal<string | null>(null);
   selectedTarget = signal<string | null>(null);
