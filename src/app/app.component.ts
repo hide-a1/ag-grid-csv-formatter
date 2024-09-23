@@ -8,6 +8,9 @@ import {
   GridApi,
   GridReadyEvent,
   RowSelectedEvent,
+  SizeColumnsToContentStrategy,
+  SizeColumnsToFitGridStrategy,
+  SizeColumnsToFitProvidedWidthStrategy,
 } from 'ag-grid-community';
 
 @Component({
@@ -34,6 +37,13 @@ export class AppComponent {
       buttons: ['reset'],
     },
   };
+  autoSizeStrategy:
+    | SizeColumnsToFitGridStrategy
+    | SizeColumnsToFitProvidedWidthStrategy
+    | SizeColumnsToContentStrategy = {
+    type: 'fitGridWidth',
+    defaultMinWidth: 100,
+  };
   rowSelection: 'single' | 'multiple' = 'multiple';
   rowSelected = false;
   newColumnName = signal('');
@@ -58,21 +68,43 @@ export class AppComponent {
       this.colDefs = headers.map((header, i) => ({
         field: header,
         cellEditor: 'agTextCellEditor',
-        headerCheckboxSelection: i === 0,
-        checkboxSelection: i === 0,
       }));
+      const indexColDef: ColDef = {
+        field: 'index',
+        headerName: '',
+        valueGetter: 'node.rowIndex + 1',
+        headerCheckboxSelection: true,
+        checkboxSelection: true,
+        sortable: false,
+        filter: false,
+        lockPinned: true,
+        pinned: 'left',
+        suppressMovable: true,
+        cellStyle: { 'background-color': '#fafafa' },
+      };
+      this.colDefs.unshift(indexColDef);
       this.rowData = rows.map((row) =>
         headers.reduce((acc: any, header, i) => {
           acc[header] = row[i];
           return acc;
         }, {})
       );
+      this.gridApi.updateGridOptions({
+        columnDefs: this.colDefs,
+        rowData: this.rowData,
+      });
+      this.gridApi.autoSizeAllColumns();
     };
     reader.readAsText(file);
   }
 
   exportCsv() {
-    this.gridApi.exportDataAsCsv();
+    const columnIds =
+      this.gridApi
+        .getColumns()
+        ?.filter((col) => col.getColDef().field !== 'index')
+        .map((col) => col.getColId()) ?? [];
+    this.gridApi.exportDataAsCsv({ columnKeys: columnIds });
   }
 
   onGridReady(params: GridReadyEvent) {
