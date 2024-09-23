@@ -78,6 +78,7 @@ export class AppComponent {
 
   rowSelected = signal<boolean>(false);
   count = signal<number>(0);
+  displayCount = signal<number>(0);
 
   // Import CSV file
   onFileChange(event: Event) {
@@ -164,6 +165,7 @@ export class AppComponent {
       });
 
       this.count.set(this.rowData.length);
+      this.displayCount.set(this.rowData.length);
       this.gridApi.updateGridOptions({
         columnDefs: this.colDefs,
         rowData: this.rowData,
@@ -188,6 +190,10 @@ export class AppComponent {
 
   onRowSelected(event: RowSelectedEvent) {
     this.rowSelected.set(event.node.isSelected() ?? false);
+  }
+
+  onFilterChanged() {
+    this.displayCount.set(this.gridApi.getDisplayedRowCount());
   }
 
   deleteSelectedRows() {
