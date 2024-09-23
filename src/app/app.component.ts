@@ -18,7 +18,7 @@ import {
   SizeColumnsToFitGridStrategy,
   SizeColumnsToFitProvidedWidthStrategy,
 } from 'ag-grid-community';
-import { AddColumnDialogComponent } from './components/add-column-dialog/add-column-dialog.component';
+import { AddColumnDialogComponent } from './components/dialogs/add-column-dialog/add-column-dialog.component';
 
 @Component({
   selector: 'app-root',
