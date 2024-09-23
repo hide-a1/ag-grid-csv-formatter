@@ -19,6 +19,7 @@ import {
   SizeColumnsToFitGridStrategy,
   SizeColumnsToFitProvidedWidthStrategy,
 } from 'ag-grid-community';
+import * as XLSX from 'xlsx';
 import { AddColumnDialogComponent } from './components/dialogs/add-column-dialog/add-column-dialog.component';
 import {
   ReplaceColumnValue,
@@ -89,10 +90,16 @@ export class AppComponent {
   handleFile(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
-      const csvData = reader.result as string;
-      const lines = csvData.split('\n');
-      const headers = lines[0].split(',');
-      const rows = lines.slice(1).map((line) => line.split(','));
+      const bstr = reader.result;
+      const workBook = XLSX.read(bstr, { type: 'binary' });
+      const workSheetName = workBook.SheetNames[0];
+      const workSheet = workBook.Sheets[workSheetName];
+      const fileData = XLSX.utils.sheet_to_json(workSheet, {
+        header: 1,
+      }) as string[][];
+
+      const headers = fileData[0];
+      const rows = fileData.slice(1);
 
       this.colDefs = headers.map((header, i) => ({
         field: header,
