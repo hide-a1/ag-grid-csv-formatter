@@ -43,7 +43,7 @@ export class AppComponent {
 
   themeClass = 'ag-theme-quartz';
   // Row Data: The data to be displayed.
-  rowData: any[] = [];
+  rowData: { [key: string]: string }[] = [];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [];
   defaultColDef: ColDef = {
@@ -68,6 +68,7 @@ export class AppComponent {
     ...AG_GRID_LOCALE_JP,
     noRowsToShow: 'データがありません、CSVファイルをインポートしてください。',
   };
+  duplicateValueMap = new Map<string, string[]>();
 
   // Import CSV file
   onFileChange(event: Event) {
@@ -88,6 +89,30 @@ export class AppComponent {
       this.colDefs = headers.map((header, i) => ({
         field: header,
         cellEditor: 'agTextCellEditor',
+        filterParams: {
+          filterOptions: [
+            'empty',
+            'contains',
+            'notContains',
+            'startsWith',
+            'endsWith',
+            'equals',
+            'notEqual',
+            'blank',
+            'notBlank',
+            {
+              displayKey: 'duplicated' + i,
+              displayName: '重複',
+              predicate: ([filterValue]: [string], cellValue: string) => {
+                return (
+                  this.duplicateValueMap.get(header)?.includes(cellValue) ??
+                  false
+                );
+              },
+              numberOfInputs: 0,
+            },
+          ],
+        },
       }));
       const indexColDef: ColDef = {
         field: 'index',
@@ -109,6 +134,20 @@ export class AppComponent {
           return acc;
         }, {})
       );
+      headers.forEach((headerKey) => {
+        const seenValues = new Set<string>();
+        const duplicatedValues = new Set<string>();
+        this.rowData.forEach((row) => {
+          const value = row[headerKey];
+          if (seenValues.has(value)) {
+            duplicatedValues.add(value);
+          } else {
+            seenValues.add(value);
+          }
+        });
+        this.duplicateValueMap.set(headerKey, Array.from(duplicatedValues));
+      });
+
       this.gridApi.updateGridOptions({
         columnDefs: this.colDefs,
         rowData: this.rowData,
