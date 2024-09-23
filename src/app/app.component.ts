@@ -1,3 +1,4 @@
+import { AG_GRID_LOCALE_JP } from '@ag-grid-community/locale';
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
@@ -33,6 +34,7 @@ export class AppComponent {
   rowSelection: 'single' | 'multiple' = 'multiple';
   rowSelected = false;
   newColumnName = signal('');
+  localText = AG_GRID_LOCALE_JP;
 
   // Import CSV file
   onFileChange(event: Event) {
