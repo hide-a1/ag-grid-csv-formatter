@@ -1,6 +1,12 @@
 import { AG_GRID_LOCALE_JP } from '@ag-grid-community/locale';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterOutlet } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -12,16 +18,28 @@ import {
   SizeColumnsToFitGridStrategy,
   SizeColumnsToFitProvidedWidthStrategy,
 } from 'ag-grid-community';
+import { AddColumnDialogComponent } from './components/add-column-dialog/add-column-dialog.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AgGridAngular, FormsModule],
+  imports: [
+    RouterOutlet,
+    AgGridAngular,
+    FormsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatDialogModule,
+    MatTooltipModule,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
   private gridApi!: GridApi;
+  private readonly dialog = inject(MatDialog);
 
   themeClass = 'ag-theme-quartz';
   // Row Data: The data to be displayed.
@@ -45,9 +63,11 @@ export class AppComponent {
     defaultMinWidth: 100,
   };
   rowSelection: 'single' | 'multiple' = 'multiple';
-  rowSelected = false;
-  newColumnName = signal('');
-  localText = AG_GRID_LOCALE_JP;
+  rowSelected = signal<boolean>(false);
+  localText = {
+    ...AG_GRID_LOCALE_JP,
+    noRowsToShow: 'データがありません、CSVファイルをインポートしてください。',
+  };
 
   // Import CSV file
   onFileChange(event: Event) {
@@ -112,10 +132,11 @@ export class AppComponent {
   }
 
   onRowSelected(event: RowSelectedEvent) {
-    this.rowSelected = event.node.isSelected() ?? false;
+    this.rowSelected.set(event.node.isSelected() ?? false);
   }
 
   deleteSelectedRows() {
+    if (!this.rowSelected()) return;
     const selectedData = this.gridApi.getSelectedRows();
     this.gridApi.applyTransaction({ remove: selectedData })!;
   }
@@ -126,6 +147,17 @@ export class AppComponent {
     });
   }
 
+  openAddColumnDialog() {
+    this.dialog
+      .open(AddColumnDialogComponent)
+      .afterClosed()
+      .subscribe((columnName) => {
+        if (columnName) {
+          this.addColumn(columnName);
+        }
+      });
+  }
+
   addColumn(columnName: string) {
     const newCol = {
       field: columnName,
@@ -134,6 +166,5 @@ export class AppComponent {
     };
     this.colDefs.push(newCol);
     this.gridApi.updateGridOptions({ columnDefs: this.colDefs });
-    this.newColumnName.set('');
   }
 }

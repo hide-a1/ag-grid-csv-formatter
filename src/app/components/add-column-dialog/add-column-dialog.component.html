@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>列の追加</h2>
+<mat-dialog-content>
+  <p>追加する列の名前を入力してください</p>
+  <mat-form-field>
+    <mat-label>列名</mat-label>
+    <input matInput [(ngModel)]="columnName" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="cancel()">キャンセル</button>
+  <button mat-button [mat-dialog-close]="columnName()" cdkFocusInitial>
+    追加
+  </button>
+</mat-dialog-actions>

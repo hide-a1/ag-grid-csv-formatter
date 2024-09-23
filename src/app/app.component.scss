@@ -8,6 +8,9 @@
 .actions {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 8px;
 }
