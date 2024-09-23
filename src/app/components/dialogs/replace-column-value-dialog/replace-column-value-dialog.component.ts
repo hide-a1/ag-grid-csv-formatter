@@ -9,6 +9,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
@@ -41,6 +42,7 @@ export type ReplaceColumnValue = {
     MatDialogClose,
     MatSelectModule,
     MatRadioModule,
+    MatDividerModule,
   ],
   templateUrl: './replace-column-value-dialog.component.html',
   styleUrl: './replace-column-value-dialog.component.scss',

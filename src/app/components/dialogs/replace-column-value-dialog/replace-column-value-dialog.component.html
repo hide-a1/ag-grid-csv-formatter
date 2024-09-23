@@ -8,7 +8,9 @@
       <mat-option [value]="column">
         {{ column }}
       </mat-option>
-      }
+      @if (!$last) {
+      <mat-divider></mat-divider>
+      } }
     </mat-select>
   </mat-form-field>
   @if (selectedColumn() !== null) {
@@ -20,7 +22,9 @@
       <mat-option [value]="value">
         {{ value }}
       </mat-option>
-      }
+      @if (!$last) {
+      <mat-divider></mat-divider>
+      } }
     </mat-select>
   </mat-form-field>
   <p>置換後の値を入力してください</p>
@@ -29,12 +33,10 @@
     <input matInput [(ngModel)]="replaceValue" />
   </mat-form-field>
   <p>列を新しく追加するか、既存の列を置換するか選択してください</p>
-
   <mat-radio-group [(ngModel)]="replaceType">
     <mat-radio-button value="add"> 新しく追加 </mat-radio-button>
     <mat-radio-button value="replace"> 既存の列を置換 </mat-radio-button>
   </mat-radio-group>
-
   @if (replaceType() === 'add') {
   <p>新しい列名を入力してください</p>
   <mat-form-field>
