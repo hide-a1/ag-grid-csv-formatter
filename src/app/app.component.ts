@@ -92,7 +92,7 @@ export class AppComponent {
     const reader = new FileReader();
     reader.onload = () => {
       const bstr = reader.result;
-      const workBook = XLSX.read(bstr, { type: 'binary' });
+      const workBook = XLSX.read(bstr, { type: 'binary', cellDates: true });
       const workSheetName = workBook.SheetNames[0];
       const workSheet = workBook.Sheets[workSheetName];
       const fileData = XLSX.utils.sheet_to_json(workSheet, {
