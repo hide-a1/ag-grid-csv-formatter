@@ -9,7 +9,7 @@
         {{ column }}
       </mat-option>
       @if (!$last) {
-      <mat-divider></mat-divider>
+      <div style="border-bottom: 1px solid #e0e0e0"></div>
       } }
     </mat-select>
   </mat-form-field>
@@ -18,13 +18,20 @@
   <mat-form-field>
     <mat-label>値</mat-label>
     <mat-select [(ngModel)]="selectedTarget">
-      @for (value of targetValueOptions(); track value) {
-      <mat-option [value]="value">
-        {{ value }}
-      </mat-option>
-      @if (!$last) {
-      <mat-divider></mat-divider>
-      } }
+      <cdk-virtual-scroll-viewport
+        itemSize="48"
+        style="height: 192px"
+        [minBufferPx]="400"
+      >
+        <div
+          *cdkVirtualFor="let value of targetValueOptions()"
+          style="height: 48px; border-bottom: 1px solid #e0e0e0"
+        >
+          <mat-option [value]="value">
+            {{ value }}
+          </mat-option>
+        </div>
+      </cdk-virtual-scroll-viewport>
     </mat-select>
   </mat-form-field>
   <p>置換後の値を入力してください</p>

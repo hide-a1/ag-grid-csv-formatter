@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -43,6 +44,7 @@ export type ReplaceColumnValue = {
     MatSelectModule,
     MatRadioModule,
     MatDividerModule,
+    ScrollingModule,
   ],
   templateUrl: './replace-column-value-dialog.component.html',
   styleUrl: './replace-column-value-dialog.component.scss',
