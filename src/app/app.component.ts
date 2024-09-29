@@ -25,6 +25,16 @@ import {
   ReplaceColumnValue,
   ReplaceColumnValueDialogComponent,
 } from './components/dialogs/replace-column-value-dialog/replace-column-value-dialog.component';
+import { getColumnType } from './shared/functions/get-column-data-type';
+
+type FilterOption =
+  | string
+  | {
+      displayKey: string;
+      displayName: string;
+      predicate: ([filterValue]: [string], cellValue: string) => boolean;
+      numberOfInputs: number;
+    };
 
 @Component({
   selector: 'app-root',
@@ -75,6 +85,38 @@ export class AppComponent {
     noRowsToShow: 'データがありません、CSVファイルをインポートしてください。',
   };
   duplicateValueMap = new Map<string, string[]>();
+  private readonly numberFilterOptions: FilterOption[] = [
+    'equals',
+    'notEqual',
+    'lessThan',
+    'lessThanOrEqual',
+    'greaterThan',
+    'greaterThanOrEqual',
+    'inRange',
+    'blank',
+    'notBlank',
+  ];
+  private readonly dateFilterOptions: FilterOption[] = [
+    'equals',
+    'notEqual',
+    'lessThan',
+    'lessThanOrEqual',
+    'greaterThan',
+    'greaterThanOrEqual',
+    'inRange',
+    'blank',
+    'notBlank',
+  ];
+  private readonly stringFilterOptions: FilterOption[] = [
+    'contains',
+    'notContains',
+    'startsWith',
+    'endsWith',
+    'equals',
+    'notEqual',
+    'blank',
+    'notBlank',
+  ];
 
   rowSelected = signal<boolean>(false);
   count = signal<number>(0);
@@ -102,34 +144,63 @@ export class AppComponent {
       const headers = fileData[0];
       const rows = fileData.slice(1);
 
-      this.colDefs = headers.map((header, i) => ({
-        field: header,
-        cellEditor: 'agTextCellEditor',
-        filterParams: {
-          filterOptions: [
-            'empty',
-            'contains',
-            'notContains',
-            'startsWith',
-            'endsWith',
-            'equals',
-            'notEqual',
-            'blank',
-            'notBlank',
-            {
-              displayKey: 'duplicated' + i,
-              displayName: '重複',
-              predicate: ([filterValue]: [string], cellValue: string) => {
-                return (
-                  this.duplicateValueMap.get(header)?.includes(cellValue) ??
-                  false
-                );
+      this.rowData = rows.map((row) =>
+        headers.reduce((acc: any, header, i) => {
+          acc[header] = row[i];
+          return acc;
+        }, {})
+      );
+
+      this.colDefs = headers.map((header, i) => {
+        const colData = this.rowData.map((row) => row[header]);
+        const columnDataType = getColumnType(colData);
+        const duplicatedOption = {
+          displayKey: 'duplicated' + i,
+          displayName: '重複',
+          predicate: ([filterValue]: [string], cellValue: string) => {
+            return (
+              this.duplicateValueMap.get(header)?.includes(cellValue) ?? false
+            );
+          },
+          numberOfInputs: 0,
+        };
+        switch (columnDataType) {
+          case 'number':
+            return {
+              field: header,
+              cellEditor: 'agNumericCellEditor',
+              filter: 'agNumberColumnFilter',
+              filterParams: {
+                filterOptions: [...this.numberFilterOptions, duplicatedOption],
               },
-              numberOfInputs: 0,
-            },
-          ],
-        },
-      }));
+            };
+          case 'date':
+            return {
+              field: header,
+              cellEditor: 'agDateCellEditor',
+              filter: 'agDateColumnFilter',
+              filterParams: {
+                filterOptions: [...this.dateFilterOptions, duplicatedOption],
+              },
+            };
+          case 'boolean':
+            return {
+              field: header,
+              cellEditor: 'agSelectCellEditor',
+              cellEditorParams: {
+                values: ['true', 'false'],
+              },
+            };
+          default:
+            return {
+              field: header,
+              cellEditor: 'agTextCellEditor',
+              filterParams: {
+                filterOptions: [...this.stringFilterOptions, duplicatedOption],
+              },
+            };
+        }
+      });
       const indexColDef: ColDef = {
         field: 'index-column',
         headerName: '',
@@ -144,12 +215,6 @@ export class AppComponent {
         cellStyle: { 'background-color': '#fafafa' },
       };
       this.colDefs.unshift(indexColDef);
-      this.rowData = rows.map((row) =>
-        headers.reduce((acc: any, header, i) => {
-          acc[header] = row[i];
-          return acc;
-        }, {})
-      );
       headers.forEach((headerKey) => {
         const seenValues = new Set<string>();
         const duplicatedValues = new Set<string>();
