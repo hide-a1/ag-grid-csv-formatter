@@ -77,7 +77,6 @@ export class ReplaceColumnValueDialogComponent {
     () =>
       this.selectedColumn() === null ||
       this.selectedTarget() === null ||
-      this.replaceValue() === null ||
       this.replaceType() === null ||
       (this.replaceType() === 'add' && this.newColumnName() === null)
   );
