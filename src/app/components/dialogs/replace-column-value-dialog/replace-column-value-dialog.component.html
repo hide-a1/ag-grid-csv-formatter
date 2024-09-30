@@ -17,7 +17,7 @@
   <p>置換対象の値を選択してください</p>
   <mat-form-field>
     <mat-label>値</mat-label>
-    <mat-select [(ngModel)]="selectedTarget">
+    <mat-select [(ngModel)]="selectedTarget" multiple>
       <cdk-virtual-scroll-viewport
         itemSize="48"
         style="height: 192px"

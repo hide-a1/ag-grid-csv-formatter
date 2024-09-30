@@ -23,7 +23,7 @@ export type ReplaceTargetColumn = {
 
 export type ReplaceColumnValue = {
   columnKey: string;
-  target: string;
+  target: string[];
   replace: string;
   replaceType: 'add' | 'replace';
   newColumnName: string | null;
@@ -56,7 +56,7 @@ export class ReplaceColumnValueDialogComponent {
   headerKeys = this.data.headerKeys.filter((key) => key !== 'index-column');
 
   selectedColumn = signal<string | null>(null);
-  selectedTarget = signal<string | null>(null);
+  selectedTarget = signal<string[]>([]);
   replaceValue = signal<string | null>(null);
   replaceType = signal<'add' | 'replace' | null>(null);
   newColumnName = signal<string | null>(null);

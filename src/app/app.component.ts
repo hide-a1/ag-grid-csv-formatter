@@ -327,11 +327,11 @@ export class AppComponent {
 
   replaceColumnValue(
     targetColumnKey: string,
-    targetValue: string,
+    targetValues: string[],
     replaceValue: string
   ): void {
     this.rowData.forEach((row) => {
-      if (row[targetColumnKey] === targetValue) {
+      if (targetValues.includes(row[targetColumnKey])) {
         row[targetColumnKey] = replaceValue;
       }
     });
@@ -340,12 +340,12 @@ export class AppComponent {
 
   replaceColumnValueAndAddColumn(
     columnKey: string,
-    target: string,
+    targets: string[],
     replace: string,
     newColumnName: string
   ): void {
     this.rowData.forEach((row) => {
-      if (row[columnKey] === target) {
+      if (targets.includes(row[columnKey])) {
         row[newColumnName] = replace;
       } else {
         row[newColumnName] = row[columnKey];
