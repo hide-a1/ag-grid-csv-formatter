@@ -243,7 +243,7 @@ export class AppComponent {
   exportCsv() {
     const columnIds =
       this.gridApi
-        .getColumns()
+        .getAllDisplayedColumns()
         ?.filter((col) => col.getColDef().field !== 'index-column')
         .map((col) => col.getColId()) ?? [];
     this.gridApi.exportDataAsCsv({ columnKeys: columnIds });
