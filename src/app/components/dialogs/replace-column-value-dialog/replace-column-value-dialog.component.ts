@@ -26,16 +26,27 @@ export type ReplaceTargetColumn = {
   rowData: { [key: string]: string }[];
 };
 
+export type ReplaceColumnSetting =
+  | ReplaceColumnValue
+  | ReplaceColumnValueByRange;
+
 export type ReplaceColumnValue = {
+  targetType: 'select';
   columnKey: string;
-  target?: string[];
-  rangeTarget?: { min: number; max: number };
+  target: string[];
   replace: string;
   replaceType: 'add' | 'replace';
   newColumnName: string | null;
 };
 
-type ResultValue = {};
+export type ReplaceColumnValueByRange = {
+  targetType: 'range';
+  columnKey: string;
+  rangeTarget: { min: number; max: number };
+  replace: string | number;
+  replaceType: 'add' | 'replace';
+  newColumnName: string | null;
+};
 
 @Component({
   selector: 'app-replace-column-value-dialog',
@@ -105,6 +116,7 @@ export class ReplaceColumnValueDialogComponent {
     if (this.disableSubmit()) return;
     if (this.targetColumnType() === ColumnDataTypeEnum.NUMBER) {
       return this.dialogRef.close({
+        targetType: 'range',
         columnKey: this.selectedColumn()!,
         rangeTarget: {
           min: this.targetRangeMin()!,
@@ -117,6 +129,7 @@ export class ReplaceColumnValueDialogComponent {
     }
 
     const value: ReplaceColumnValue = {
+      targetType: 'select',
       columnKey: this.selectedColumn()!,
       target: this.selectedTarget()!,
       replace: this.replaceValue()!,

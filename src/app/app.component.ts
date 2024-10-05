@@ -22,7 +22,7 @@ import {
 import * as XLSX from 'xlsx';
 import { AddColumnDialogComponent } from './components/dialogs/add-column-dialog/add-column-dialog.component';
 import {
-  ReplaceColumnValue,
+  ReplaceColumnSetting,
   ReplaceColumnValueDialogComponent,
 } from './components/dialogs/replace-column-value-dialog/replace-column-value-dialog.component';
 import { getColumnType } from './shared/functions/get-column-data-type';
@@ -60,7 +60,7 @@ export class AppComponent {
 
   themeClass = 'ag-theme-quartz';
   // Row Data: The data to be displayed.
-  rowData: { [key: string]: string }[] = [];
+  rowData: { [key: string]: string | number | Date | boolean }[] = [];
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [];
   defaultColDef: ColDef = {
@@ -84,7 +84,10 @@ export class AppComponent {
     ...AG_GRID_LOCALE_JP,
     noRowsToShow: 'データがありません、CSVファイルをインポートしてください。',
   };
-  duplicateValueMap = new Map<string, string[]>();
+  duplicateValueMap = new Map<
+    string,
+    Array<string | number | Date | boolean>
+  >();
   private readonly numberFilterOptions: FilterOption[] = [
     'equals',
     'notEqual',
@@ -216,8 +219,8 @@ export class AppComponent {
       };
       this.colDefs.unshift(indexColDef);
       headers.forEach((headerKey) => {
-        const seenValues = new Set<string>();
-        const duplicatedValues = new Set<string>();
+        const seenValues = new Set<string | number | Date | boolean>();
+        const duplicatedValues = new Set<string | number | Date | boolean>();
         this.rowData.forEach((row) => {
           const value = row[headerKey];
           if (seenValues.has(value)) {
@@ -304,43 +307,60 @@ export class AppComponent {
         },
       })
       .afterClosed()
-      .subscribe((replaceColumnValue: ReplaceColumnValue | undefined) => {
-        if (replaceColumnValue !== undefined) {
-          const {
-            columnKey,
-            target,
-            rangeTarget,
-            replace,
-            replaceType,
-            newColumnName,
-          } = replaceColumnValue;
-          switch (replaceType) {
-            case 'replace':
-              if (target) {
-                this.replaceColumnValue(columnKey, target, replace);
-              }
-              if (rangeTarget) {
-                this.replaceColumnValueByRange(columnKey, rangeTarget, replace);
-              }
-              break;
-            case 'add':
-              if (target) {
-                this.replaceColumnValueAndAddColumn(
+      .subscribe((replaceColumnSetting: ReplaceColumnSetting | undefined) => {
+        if (replaceColumnSetting !== undefined) {
+          switch (replaceColumnSetting.targetType) {
+            case 'select':
+              {
+                const {
                   columnKey,
                   target,
                   replace,
-                  newColumnName!
-                );
-              }
-              if (rangeTarget) {
-                this.replaceColumnValueByRangeAndAddColumn(
-                  columnKey,
-                  rangeTarget,
-                  replace,
-                  newColumnName!
-                );
+                  replaceType,
+                  newColumnName,
+                } = replaceColumnSetting;
+                switch (replaceType) {
+                  case 'replace':
+                    this.replaceColumnValue(columnKey, target, replace);
+                    break;
+                  case 'add':
+                    this.replaceColumnValueAndAddColumn(
+                      columnKey,
+                      target,
+                      replace,
+                      newColumnName!
+                    );
+                    break;
+                }
               }
               break;
+            case 'range': {
+              const {
+                columnKey,
+                rangeTarget,
+                replace,
+                replaceType,
+                newColumnName,
+              } = replaceColumnSetting;
+              switch (replaceType) {
+                case 'replace':
+                  this.replaceColumnValueByRange(
+                    columnKey,
+                    rangeTarget,
+                    replace
+                  );
+
+                  break;
+                case 'add':
+                  this.replaceColumnValueByRangeAndAddColumn(
+                    columnKey,
+                    rangeTarget,
+                    replace,
+                    newColumnName!
+                  );
+                  break;
+              }
+            }
           }
         }
       });
@@ -348,8 +368,8 @@ export class AppComponent {
 
   replaceColumnValue(
     targetColumnKey: string,
-    targetValues: string[],
-    replaceValue: string
+    targetValues: Array<string | number | Date | boolean>,
+    replaceValue: string | number
   ): void {
     this.rowData.forEach((row) => {
       if (targetValues.includes(row[targetColumnKey])) {
@@ -362,7 +382,7 @@ export class AppComponent {
   replaceColumnValueByRange(
     targetColumnKey: string,
     rangeTarget: { min: number; max: number },
-    replaceValue: string
+    replaceValue: string | number | Date | boolean
   ): void {
     this.rowData.forEach((row) => {
       const value = Number(row[targetColumnKey]);
@@ -375,8 +395,8 @@ export class AppComponent {
 
   replaceColumnValueAndAddColumn(
     columnKey: string,
-    targets: string[],
-    replace: string,
+    targets: Array<string | number | Date | boolean>,
+    replace: string | number | Date | boolean,
     newColumnName: string
   ): void {
     this.rowData.forEach((row) => {
@@ -393,7 +413,7 @@ export class AppComponent {
   replaceColumnValueByRangeAndAddColumn(
     columnKey: string,
     rangeTarget: { min: number; max: number },
-    replace: string,
+    replace: string | number,
     newColumnName: string
   ): void {
     this.rowData.forEach((row) => {
