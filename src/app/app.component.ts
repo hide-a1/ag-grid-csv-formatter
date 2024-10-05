@@ -66,6 +66,7 @@ export class AppComponent {
   defaultColDef: ColDef = {
     editable: true,
     filter: 'agTextColumnFilter',
+    unSortIcon: true,
     suppressHeaderMenuButton: true,
     suppressHeaderContextMenu: true,
     filterParams: {
