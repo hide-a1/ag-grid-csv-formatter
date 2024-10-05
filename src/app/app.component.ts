@@ -216,6 +216,7 @@ export class AppComponent {
         lockPinned: true,
         pinned: 'left',
         suppressMovable: true,
+        width: 130,
         cellStyle: { 'background-color': '#fafafa' },
       };
       this.colDefs.unshift(indexColDef);
@@ -235,11 +236,6 @@ export class AppComponent {
 
       this.count.set(this.rowData.length);
       this.displayCount.set(this.rowData.length);
-      this.gridApi.updateGridOptions({
-        columnDefs: this.colDefs,
-        rowData: this.rowData,
-      });
-      this.gridApi.autoSizeAllColumns();
     };
     reader.readAsText(file);
   }
