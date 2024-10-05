@@ -306,19 +306,40 @@ export class AppComponent {
       .afterClosed()
       .subscribe((replaceColumnValue: ReplaceColumnValue | undefined) => {
         if (replaceColumnValue !== undefined) {
-          const { columnKey, target, replace, replaceType, newColumnName } =
-            replaceColumnValue;
+          const {
+            columnKey,
+            target,
+            rangeTarget,
+            replace,
+            replaceType,
+            newColumnName,
+          } = replaceColumnValue;
           switch (replaceType) {
             case 'replace':
-              this.replaceColumnValue(columnKey, target, replace);
+              if (target) {
+                this.replaceColumnValue(columnKey, target, replace);
+              }
+              if (rangeTarget) {
+                this.replaceColumnValueByRange(columnKey, rangeTarget, replace);
+              }
               break;
             case 'add':
-              this.replaceColumnValueAndAddColumn(
-                columnKey,
-                target,
-                replace,
-                newColumnName!
-              );
+              if (target) {
+                this.replaceColumnValueAndAddColumn(
+                  columnKey,
+                  target,
+                  replace,
+                  newColumnName!
+                );
+              }
+              if (rangeTarget) {
+                this.replaceColumnValueByRangeAndAddColumn(
+                  columnKey,
+                  rangeTarget,
+                  replace,
+                  newColumnName!
+                );
+              }
               break;
           }
         }
@@ -338,6 +359,20 @@ export class AppComponent {
     this.gridApi.updateGridOptions({ rowData: this.rowData });
   }
 
+  replaceColumnValueByRange(
+    targetColumnKey: string,
+    rangeTarget: { min: number; max: number },
+    replaceValue: string
+  ): void {
+    this.rowData.forEach((row) => {
+      const value = Number(row[targetColumnKey]);
+      if (rangeTarget.min <= value && value <= rangeTarget.max) {
+        row[targetColumnKey] = replaceValue;
+      }
+    });
+    this.gridApi.updateGridOptions({ rowData: this.rowData });
+  }
+
   replaceColumnValueAndAddColumn(
     columnKey: string,
     targets: string[],
@@ -346,6 +381,24 @@ export class AppComponent {
   ): void {
     this.rowData.forEach((row) => {
       if (targets.includes(row[columnKey])) {
+        row[newColumnName] = replace;
+      } else {
+        row[newColumnName] = row[columnKey];
+      }
+    });
+    this.addColumn(newColumnName);
+    this.gridApi.updateGridOptions({ rowData: this.rowData });
+  }
+
+  replaceColumnValueByRangeAndAddColumn(
+    columnKey: string,
+    rangeTarget: { min: number; max: number },
+    replace: string,
+    newColumnName: string
+  ): void {
+    this.rowData.forEach((row) => {
+      const value = Number(row[columnKey]);
+      if (rangeTarget.min <= value && value <= rangeTarget.max) {
         row[newColumnName] = replace;
       } else {
         row[newColumnName] = row[columnKey];

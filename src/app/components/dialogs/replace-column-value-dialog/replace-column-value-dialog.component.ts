@@ -15,6 +15,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
+import { getColumnType } from '../../../shared/functions/get-column-data-type';
+import {
+  ColumnDataType,
+  ColumnDataTypeEnum,
+} from '../../../shared/types/column-data-type';
 
 export type ReplaceTargetColumn = {
   headerKeys: string[];
@@ -23,11 +28,14 @@ export type ReplaceTargetColumn = {
 
 export type ReplaceColumnValue = {
   columnKey: string;
-  target: string[];
+  target?: string[];
+  rangeTarget?: { min: number; max: number };
   replace: string;
   replaceType: 'add' | 'replace';
   newColumnName: string | null;
 };
+
+type ResultValue = {};
 
 @Component({
   selector: 'app-replace-column-value-dialog',
@@ -53,10 +61,14 @@ export class ReplaceColumnValueDialogComponent {
   readonly data = inject<ReplaceTargetColumn>(MAT_DIALOG_DATA);
   readonly dialogRef = inject(MatDialogRef<ReplaceColumnValueDialogComponent>);
 
+  readonly ColumnDataTypeEnum = ColumnDataTypeEnum;
+
   headerKeys = this.data.headerKeys.filter((key) => key !== 'index-column');
 
   selectedColumn = signal<string | null>(null);
   selectedTarget = signal<string[]>([]);
+  targetRangeMin = signal<number | null>(null);
+  targetRangeMax = signal<number | null>(null);
   replaceValue = signal<string | null>(null);
   replaceType = signal<'add' | 'replace' | null>(null);
   newColumnName = signal<string | null>(null);
@@ -80,9 +92,29 @@ export class ReplaceColumnValueDialogComponent {
       this.replaceType() === null ||
       (this.replaceType() === 'add' && this.newColumnName() === null)
   );
+  targetColumnType = computed<ColumnDataType | null>(() => {
+    const selectedColumn = this.selectedColumn();
+
+    if (selectedColumn === null) return null;
+
+    const targetValue = this.data.rowData.map((row) => row[selectedColumn]);
+    return getColumnType(targetValue);
+  });
 
   submit(): void {
     if (this.disableSubmit()) return;
+    if (this.targetColumnType() === ColumnDataTypeEnum.NUMBER) {
+      return this.dialogRef.close({
+        columnKey: this.selectedColumn()!,
+        rangeTarget: {
+          min: this.targetRangeMin()!,
+          max: this.targetRangeMax()!,
+        },
+        replace: this.replaceValue()!,
+        replaceType: this.replaceType()!,
+        newColumnName: this.newColumnName(),
+      });
+    }
 
     const value: ReplaceColumnValue = {
       columnKey: this.selectedColumn()!,
@@ -92,6 +124,6 @@ export class ReplaceColumnValueDialogComponent {
       newColumnName: this.newColumnName(),
     };
 
-    this.dialogRef.close(value);
+    return this.dialogRef.close(value);
   }
 }

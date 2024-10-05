@@ -13,8 +13,27 @@
       } }
     </mat-select>
   </mat-form-field>
+
   @if (selectedColumn() !== null) {
   <p>置換対象の値を選択してください</p>
+  @switch (targetColumnType()) { @case (ColumnDataTypeEnum.NUMBER) {
+  <div style="display: flex; gap: 8px; align-items: baseline">
+    <mat-form-field appearance="outline">
+      <mat-label>最小値</mat-label>
+      <input type="number" matInput [(ngModel)]="targetRangeMin" />
+    </mat-form-field>
+    <span>~</span>
+    <mat-form-field appearance="outline">
+      <mat-label>最大値</mat-label>
+      <input type="number" matInput [(ngModel)]="targetRangeMax" />
+    </mat-form-field>
+  </div>
+  <p>置換後の値を入力してください</p>
+  <mat-form-field>
+    <mat-label>値</mat-label>
+    <input matInput [(ngModel)]="replaceValue" />
+  </mat-form-field>
+  } @default {
   <mat-form-field>
     <mat-label>値</mat-label>
     <mat-select [(ngModel)]="selectedTarget" multiple>
@@ -22,6 +41,7 @@
         itemSize="48"
         style="height: 192px"
         [minBufferPx]="400"
+        [maxBufferPx]="800"
       >
         <div
           *cdkVirtualFor="let value of targetValueOptions()"
@@ -39,6 +59,8 @@
     <mat-label>値</mat-label>
     <input matInput [(ngModel)]="replaceValue" />
   </mat-form-field>
+  } }
+
   <p>列を新しく追加するか、既存の列を置換するか選択してください</p>
   <mat-radio-group [(ngModel)]="replaceType">
     <mat-radio-button value="add"> 新しく追加 </mat-radio-button>
